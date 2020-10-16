@@ -7,102 +7,130 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdarg.h>  //variadic
+#include <stdarg.h> //variadic
 
-namespace abc_compiler {
-//////////////////////////////////////////////////////////////////////////
+namespace abc_compiler
+{
+	//////////////////////////////////////////////////////////////////////////
 
-///@brief: use this template to retrieve T's type from compiler
-///        Usage: TypeDisplayer<decltype(var_to_investigate)> varType;
-template <typename T>
-class TypeDisplayer;
+	///@brief: use this template to retrieve T's type from compiler
+	///        Usage: TypeDisplayer<decltype(var_to_investigate)> varType;
+	template <typename T>
+	class TypeDisplayer;
 
-template <typename T>
-void DisplayType(T param) {
-  ABC_FAIL("Needs RTTI");
-  // std::cout << "T type: " << typeid(T).name() << std::endl;
-  // std::cout << "Param type: " << typeid(param).name() << std::endl;
-}
+	template <typename T>
+	void DisplayType(T param)
+	{
+		ABC_FAIL("Needs RTTI");
+		// std::cout << "T type: " << typeid(T).name() << std::endl;
+		// std::cout << "Param type: " << typeid(param).name() << std::endl;
+	}
 
-//////////////////////////////////////////////////////////////////////////
-}  // namespace abc_compiler
+	//////////////////////////////////////////////////////////////////////////
+} // namespace abc_compiler
 
-namespace abc {
-//////////////////////////////////////////////////////////////////////////
+namespace abc
+{
+	//////////////////////////////////////////////////////////////////////////
 
-namespace detail {
-///////////////////////////////////////////////////////////////////////////////
+	namespace detail
+	{
+		///////////////////////////////////////////////////////////////////////////////
 
-///@brief compute index of T in the variadic types
-template <typename T>
-int ComputeIndexInVariadic(int index = -1) {
-  return -1;
-}
-template <typename T, typename U, typename... Us>
-int ComputeIndexInVariadic(int index = -1) {
-  if (std::is_same<T, U>::value) { return index + 1; }
+		///@brief compute index of T in the variadic types
+		template <typename T>
+		int ComputeIndexInVariadic(int index = -1)
+		{
+			return -1;
+		}
+		template <typename T, typename U, typename... Us>
+		int ComputeIndexInVariadic(int index = -1)
+		{
+			if (std::is_same<T, U>::value)
+			{
+				return index + 1;
+			}
 
-  return ComputeIndexInVariadic<T, Us...>(index + 1);
-}
+			return ComputeIndexInVariadic<T, Us...>(index + 1);
+		}
 
-///@return variadic argument at index position
-template <typename T>
-T GetVariadicArgument(int index, const T& param) {
-  ABC_ASSERT(index >= 0, "Not enough parameters in the variadic");
-  return param;
-}
-template <typename T, typename... Args>
-T GetVariadicArgument(int index, const T& param, Args const&... args) {
-  if (index == 0) { return param; }
-  return GetVariadicArgument(index - 1, std::forward<const Args>(args)...);
-}
+		///@return variadic argument at index position
+		template <typename T>
+		T get_variadic_argument(int index, const T &param)
+		{
+			ABC_ASSERT(index >= 0, "Not enough parameters in the variadic");
+			return param;
+		}
+		template <typename T, typename... Args>
+		T get_variadic_argument(int index, const T &param, Args const &... args)
+		{
+			if (index == 0)
+			{
+				return param;
+			}
+			return get_variadic_argument(index - 1, std::forward<const Args>(args)...);
+		}
 
-//////////////////////////////////////////////////////////////////////////
-}  // namespace detail
+		//////////////////////////////////////////////////////////////////////////
+	} // namespace detail
 
-namespace algo {
-//////////////////////////////////////////////////////////////////////////
+	namespace algo
+	{
+		//////////////////////////////////////////////////////////////////////////
 
-template <class String>
-std::vector<String> split(const String& str, const char delimiter) {
-  std::vector<String> result;
-  result.reserve(8);
+		template <class String>
+		std::vector<String> split(const String &str, const char delimiter)
+		{
+			std::vector<String> result;
+			result.reserve(8);
 
-  String accum;
-  accum.reserve(8);
+			String accum;
+			accum.reserve(8);
 
-  const char* strPtr = str.data();
-  while (*strPtr != '\0') {
-    if (*strPtr != delimiter) {
-      accum.push_back(*strPtr);
-    } else {
-      if (!accum.empty()) { result.push_back(accum); }
-      accum.clear();
-    }
+			const char *strPtr = str.data();
+			while (*strPtr != '\0')
+			{
+				if (*strPtr != delimiter)
+				{
+					accum.push_back(*strPtr);
+				}
+				else
+				{
+					if (!accum.empty())
+					{
+						result.push_back(accum);
+					}
+					accum.clear();
+				}
 
-    ++strPtr;
-  }
+				++strPtr;
+			}
 
-  return result;
-}
+			return result;
+		}
 
-template <class String>
-std::vector<String> trim(const String& str, const char token) {
-  String accum;
-  accum.reserve(str.size());
+		template <class String>
+		std::vector<String> trim(const String &str, const char token)
+		{
+			String accum;
+			accum.reserve(str.size());
 
-  const char* strPtr = str.data();
-  while (*strPtr != '\0') {
-    if (*strPtr != token) { accum.push_back(*strPtr); }
-    ++strPtr;
-  }
+			const char *strPtr = str.data();
+			while (*strPtr != '\0')
+			{
+				if (*strPtr != token)
+				{
+					accum.push_back(*strPtr);
+				}
+				++strPtr;
+			}
 
-  accum.shink_to_fit();
-  return accum;
-}
+			accum.shink_to_fit();
+			return accum;
+		}
 
-//////////////////////////////////////////////////////////////////////////
-}  // namespace algo
+		//////////////////////////////////////////////////////////////////////////
+	} // namespace algo
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -169,5 +197,5 @@ struct variant
 
 #endif
 
-//////////////////////////////////////////////////////////////////////////
-}  // namespace abc
+	//////////////////////////////////////////////////////////////////////////
+} // namespace abc
