@@ -46,8 +46,8 @@ TEST_CASE("abc - tagged_type")
 	CHECK((value1 * cvalue1).value() == value1.value() * cvalue1.value());
 	CHECK((value1 / cvalue1).value() == value1.value() / cvalue1.value());
 
-	CHECK([=]{ return value1 + cvalue1; }().value() == (value1 += cvalue1).value());
-	CHECK([=]{ return value1 - cvalue1; }().value() == (value1 -= cvalue1).value());
-	CHECK([=]{ return value1 * cvalue1; }().value() == (value1 *= cvalue1).value());
-	CHECK([=]{ return value1 / cvalue1; }().value() == (value1 /= cvalue1).value());
+	auto expectedValue0 = value1 + cvalue1; CHECK(expectedValue0.value() == (value1 += cvalue1).value());
+	auto expectedValue1 = value1 - cvalue1; CHECK(expectedValue1.value() == (value1 -= cvalue1).value());
+	auto expectedValue2 = value1 * cvalue1; CHECK(expectedValue2.value() == (value1 *= cvalue1).value());
+	auto expectedValue3 = value1 / cvalue1; CHECK(expectedValue3.value() == (value1 /= cvalue1).value());
 }
