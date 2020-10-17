@@ -7,6 +7,8 @@
 
 #include "abc/tagged_type.hpp"
 
+#include <cassert>
+
 TEST_CASE("abc - tagged_type")
 {
 	using namespace abc;
@@ -44,8 +46,8 @@ TEST_CASE("abc - tagged_type")
 	CHECK((value1 * cvalue1).value() == value1.value() * cvalue1.value());
 	CHECK((value1 / cvalue1).value() == value1.value() / cvalue1.value());
 
-	CHECK(value1.value() + cvalue1.value() == (value1 += cvalue1).value());
-	CHECK(value1.value() - cvalue1.value() == (value1 -= cvalue1).value());
-	CHECK(value1.value() * cvalue1.value() == (value1 *= cvalue1).value());
-	CHECK(value1.value() / cvalue1.value() == (value1 /= cvalue1).value());
+	CHECK([=]{ return value1 + cvalue1; }().value() == (value1 += cvalue1).value());
+	CHECK([=]{ return value1 - cvalue1; }().value() == (value1 -= cvalue1).value());
+	CHECK([=]{ return value1 * cvalue1; }().value() == (value1 *= cvalue1).value());
+	CHECK([=]{ return value1 / cvalue1; }().value() == (value1 /= cvalue1).value());
 }

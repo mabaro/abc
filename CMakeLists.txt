@@ -39,18 +39,20 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) # main CmakeLists.txt
 
 	###################################################################
 
-    # setup testing framework
-    #find_package(doctest REQUIRED)
+    if(ENABLE_UNIT_TESTS)
+        # setup testing framework
+        #find_package(doctest REQUIRED)
     
-    set(DOCTEST_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/doctest)
-    add_library(doctest::doctest IMPORTED INTERFACE)
-    set_target_properties(doctest::doctest
-        PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${DOCTEST_INCLUDE_DIR}"
-    )
-    
-    # enable test framework
-    include(CTest)
+        set(DOCTEST_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extern/doctest)
+        add_library(doctest::doctest IMPORTED INTERFACE)
+        set_target_properties(doctest::doctest
+            PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${DOCTEST_INCLUDE_DIR}"
+        )
+        
+        # enable test framework
+        include(CTest) #enable_testing()
+    endif()
 endif()
 
 #################################################################################
@@ -113,12 +115,6 @@ if(ENABLE_UNIT_TESTS AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     target_link_libraries(project_options INTERFACE doctest::doctest)
     
-    # Testing only available if this is the main app
-    # Note this needs to be done in the main CMakeLists
-    # since it calls enable_testing, which must be in the
-    # main CMakeLists.
-    include(CTest)
-    enable_testing()
     add_subdirectory(tests)
 endif()
 
