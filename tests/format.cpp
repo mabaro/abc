@@ -1,9 +1,29 @@
 #include "doctest/doctest.h"
 
 #include "abc/format.hpp"
+#include "abc/enum.hpp"
 #include "abc/string.hpp"
 
-TEST_CASE("abc - format") {
+TEST_CASE("abc - format - to_string")
+{
+  using namespace abc;
+
+  CHECK(to_string('t') == "t");
+  CHECK(to_string(int(1)) == "1");
+  CHECK(to_string(1.3f) == "1.3");
+}
+
+TEST_CASE("abc - format - from_string")
+{
+  using namespace abc;
+
+  CHECK(from_string<char>("1") == '1');
+  CHECK(from_string<int>("12") == 12);
+  CHECK(from_string<float>("1.2f") == 1.2f);
+}
+
+TEST_CASE("abc - format")
+{
   using namespace abc;
 
   CHECK(format("{}", 'h') == "h");
@@ -22,42 +42,58 @@ TEST_CASE("abc - format") {
   CHECK(format("{}. {}", string("hola"), string("Adios")) == string("hola. Adios"));
 }
 
-TEST_CASE("abc - format - int performance") {
+TEST_CASE("abc - format - int performance")
+{
   using namespace abc;
-
-  const int32_t samples[] = {
-    1,2,3,4,5,6,7,8,9,10,
-    11,12,13,14,15,16,17,18,19,20,
-    21,22,23,24,25,26,27,28,29,30,
-    31,32,33,34,35,36,37,38,39,40,
-  };
-  const int32_t numSamples = sizeof(samples) / sizeof(samples[0]);
-
-  for (int32_t i = 0; i < 100; ++i) { CHECK(format("{}", to_string(i)) == to_string(i)); }
+  for (int32_t i = 0; i < 100; ++i)
+  {
+    CHECK(format("{}", to_string(i)) == to_string(i));
+  }
 }
 
-TEST_CASE("abc - format - std::stream int performance") {
+TEST_CASE("abc - format - std::stream int performance")
+{
   using namespace abc;
-
-  const int32_t samples[] = {
-      1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-  };
-  const int32_t numSamples = sizeof(samples) / sizeof(samples[0]);
-
-  for (int32_t i = 0; i < 100; ++i) { CHECK(format("{}", to_string(i)) == to_string(i)); }
+  for (int32_t i = 0; i < 100; ++i)
+  {
+    CHECK(format("{}", to_string(i)) == to_string(i));
+  }
 }
 
-TEST_CASE("abc - format - str performance") {
+TEST_CASE("abc - format - str performance")
+{
   using namespace abc;
 
   const string samples[] = {
-      "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc",
-      "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc", "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
+      "abc",
   };
   const int32_t numSamples = sizeof(samples) / sizeof(samples[0]);
 
-  for (int32_t i = 0; i < 100; ++i) {
+  for (int32_t i = 0; i < 100; ++i)
+  {
     CHECK(format("{}", to_string(samples[i % numSamples])) == to_string(samples[i % numSamples]));
   }
 }
