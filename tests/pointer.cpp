@@ -147,3 +147,12 @@ TEST_CASE("abc - unique_pointer - move") {
    MoveTester::sink(std::move(int2));
   ABC_CHECK(int2.get_raw_ptr() == nullptr);
 }
+
+
+TEST_CASE("abc - shared_pointer")
+{
+  using namespace abc;
+
+  shared_ptr<int> i0(new int(1));
+  shared_ptr<int> i1 = i0;
+}

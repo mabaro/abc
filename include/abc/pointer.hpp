@@ -4,6 +4,7 @@
 #include "abc/debug.hpp"
 
 #include <atomic>
+#include <memory>
 
 #define ABC_TESTING_ENABLED
 #ifdef ABC_TESTING_ENABLED
