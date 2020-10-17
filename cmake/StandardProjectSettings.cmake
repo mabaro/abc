@@ -39,4 +39,3 @@ if(ENABLE_IPO)
         message(WARNING "IPO is not supported: ${output}")
     endif()
 endif()
-

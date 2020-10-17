@@ -59,6 +59,15 @@ function(target_set_compile_warnings target_name)
       -Wdouble-promotion # warn if float is implicit promoted to double
       -Wformat=2 # warn on security issues around functions that format output
                  # (ie printf)
+      ##########################
+      # BLACKLISTED
+      ##########################
+      -Wno-c++98-compat
+      -Wno-c++98-compat-pedantic
+      -Wno-duplicate-enum        # duplicated enum strings generate these warnings, but this is commonly used (i.e., FIRST, LAST, COUNT)
+      -Wno-exit-time-destructors # static enum strings generate these warnings
+      -Wno-extra-semi-stmt       # ABC_ASSERT() gets nullified on release, generating these warnings
+      #-Wno-extra-semi            # due to some macros 
   )
 
   if (WARNINGS_AS_ERRORS)
