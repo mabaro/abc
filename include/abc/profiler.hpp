@@ -3,9 +3,6 @@
 #include "abc/string.hpp"
 #include "abc/timer.hpp"
 
-#include "math/core.hpp" //min/max
-#include "math/constants.hpp" //limits
-
 #include <iostream>
 #include <vector>
 #include <mutex>
@@ -16,7 +13,7 @@ namespace detail
 {
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Profiler
+struct profiler
 {
 protected:
 	struct ProfilingData;
@@ -24,7 +21,7 @@ protected:
 	using sample_container_iterator_t = sample_container_t::iterator;
 
 public:
-	static Profiler& GetInstance() { static Profiler theInstance; return theInstance; }
+	static profiler& GetInstance() { static profiler theInstance; return theInstance; }
 
 	void initialize() {}
 
@@ -34,19 +31,19 @@ public:
 		std::cout << "-- Profiling summary" << std::endl;
 		std::cout << "-----------------------------------------------------------------" << std::endl;
 
-		const auto timeUnitsFunc = [](const abc::time::duration& duration)
+		const auto timeUnitsFunc = [](const abc::chrono::duration& duration)
 		{
-			if (duration >= abc::time::seconds(1))
+			if (duration >= abc::chrono::seconds(1))
 			{
-				return abc::format("{} s", 0.001f * std::chrono::duration_cast<abc::time::milliseconds>(duration).count());
+				return abc::format("{} s", std::chrono::duration_cast<abc::chrono::secondsf>(duration).count());
 			}
-			else if (duration >= abc::time::milliseconds(1))
+			else if (duration >= abc::chrono::milliseconds(1))
 			{
-				return abc::format("{} ms", 0.001f * std::chrono::duration_cast<abc::time::microseconds>(duration).count());
+				return abc::format("{} ms", std::chrono::duration_cast<abc::chrono::millisecondsf>(duration).count());
 			}
 			else
 			{
-				return abc::format("{} us", std::chrono::duration_cast<abc::time::microseconds>(duration).count());
+				return abc::format("{} us", std::chrono::duration_cast<abc::chrono::microsecondsf>(duration).count());
 			}
 		};
 
@@ -58,7 +55,6 @@ public:
 			}
 
 			const auto avgTime = data.accumDuration / data.samples;
-			const bool millisOrMicros = avgTime >= abc::time::microseconds(1000);
 			if (data.samples > 1)
 			{
 				if (data.mt_lockedTime > ProfilingData::duration(0))
@@ -126,7 +122,7 @@ public:
 			}
 			else
 			{
-				ABC_LOG_DEBUG("Call to Profiler::declare({}) failed because the tag is already registered", tag);
+				ABC_LOG_DEBUG("Call to profiler::declare({}) failed because the tag is already registered", tag);
 			}
 		}
 	}
@@ -142,9 +138,9 @@ public:
 
 	void tick_mt(const abc::string& tag)
 	{
-		abc::time::Timer timer;
+		abc::chrono::timer timer;
 		std::lock_guard<std::mutex> mutexLock(m_mutex);
-		auto lockedDuration = timer.GetElapsedTime();
+		auto lockedDuration = timer.get_elapsed_time();
 
 		auto it = internal_tick(tag);
 
@@ -156,9 +152,9 @@ public:
 	}
 	void tock_mt(const abc::string& tag)
 	{
-		abc::time::Timer timer;
+		abc::chrono::timer timer;
 		std::lock_guard<std::mutex> mutexLock(m_mutex);
-		auto lockedDuration = timer.GetElapsedTime();
+		auto lockedDuration = timer.get_elapsed_time();
 
 		auto it = internal_tock(tag);
 
@@ -177,13 +173,13 @@ protected:
 			[&tag](const ProfilingData& data) { return data.tag == tag; });
 		if (it != m_samples.end())
 		{
-			ABC_ASSERT(it->t0 == abc::time::Timer::time_point_t(),
+			ABC_ASSERT(it->t0 == abc::chrono::timer::time_point_t(),
 				"Call to PROFILE_BEGIN without PROFILE_END.");
-			it->t0 = abc::time::Timer::Now();
+			it->t0 = abc::chrono::timer::now();
 		}
 		else
 		{
-			m_samples.emplace_back(tag, abc::time::Timer::Now());
+			m_samples.emplace_back(tag, abc::chrono::timer::now());
 		}
 
 		return it;
@@ -195,13 +191,13 @@ protected:
 			[&tag](const ProfilingData& data) { return data.tag == tag; });
 		if (it != m_samples.end())
 		{
-			ABC_ASSERT(it->t0 != abc::time::Timer::time_point_t(),
+			ABC_ASSERT(it->t0 != abc::chrono::timer::time_point_t(),
 				"Call to PROFILE_END without PROFILE_BEGIN.");
-			const abc::time::duration elapsedTime = abc::time::Timer::Now() - it->t0;
-			it->minDuration = math::min(it->minDuration, elapsedTime);
-			it->maxDuration = math::max(it->maxDuration, elapsedTime);
+			const abc::chrono::duration elapsedTime = abc::chrono::timer::now() - it->t0;
+			it->minDuration = (it->minDuration < elapsedTime) ? it->minDuration : elapsedTime;
+			it->maxDuration = (it->maxDuration > elapsedTime) ? it->maxDuration : elapsedTime;
 			it->accumDuration += elapsedTime;
-			it->t0 = abc::time::Timer::time_point_t();
+			it->t0 = abc::chrono::timer::time_point_t();
 			++(it->samples);
 		}
 		else
@@ -217,8 +213,8 @@ protected:
 
 	struct ProfilingData
 	{
-		using duration = abc::time::Timer::duration_t;
-		using time_point = abc::time::Timer::time_point_t;
+		using duration = abc::chrono::timer::duration_t;
+		using time_point = abc::chrono::timer::time_point_t;
 
 		ProfilingData(const abc::string& i_tag)
 			: tag(i_tag)
@@ -232,7 +228,7 @@ protected:
 		abc::string tag;
 		time_point t0;
 		duration accumDuration = duration(0);
-		duration minDuration = duration(math::limits<abc::time::Timer::duration_t::rep>::max());
+		duration minDuration = duration(std::numeric_limits<duration::rep>::max());
 		duration maxDuration = duration(0);
 		size_t   samples = 0;
 
@@ -247,22 +243,21 @@ protected:
 }//abc
 
 ///////////////////////////////////////////////////////////////////////////////
-#define PROFILE_INIT() abc::detail::Profiler::GetInstance().initialize();
+#define PROFILE_INIT() abc::detail::profiler::GetInstance().initialize()
 ///////////////////////////////////////////////////////////////////////////////
 #define PROFILE_SECTION(TAG, CODE_BLOCK) do {            \
-		abc::detail::Profiler::GetInstance().tick(#TAG); \
+		abc::detail::profiler::GetInstance().tick(#TAG); \
 		sizeof(#CODE_BLOCK); \
 		{ CODE_BLOCK };                                  \
-		abc::detail::Profiler::GetInstance().tock(#TAG); \
-	} while(false);
+		abc::detail::profiler::GetInstance().tock(#TAG); \
+	} while(false)
 ///////////////////////////////////////////////////////////////////////////////
-#define PROFILE_DECLARE(TAG) do { abc::detail::Profiler::GetInstance().declare(#TAG);	  } while(false);
+#define PROFILE_DECLARE(TAG) do { abc::detail::profiler::GetInstance().declare(#TAG);	  } while(false)
 
-#define PROFILE_BEGIN(TAG) do { abc::detail::Profiler::GetInstance().tick(#TAG);	  } while(false);
-#define PROFILE_END(TAG)   do { abc::detail::Profiler::GetInstance().tock(#TAG);	  } while(false);
+#define PROFILE_BEGIN(TAG) do { abc::detail::profiler::GetInstance().tick(#TAG);	  } while(false)
+#define PROFILE_END(TAG)   do { abc::detail::profiler::GetInstance().tock(#TAG);	  } while(false)
 
-#define PROFILE_BEGIN_MT(TAG) do { abc::detail::Profiler::GetInstance().tick_mt(#TAG);	  } while(false);
-#define PROFILE_END_MT(TAG)   do { abc::detail::Profiler::GetInstance().tock_mt(#TAG);	  } while(false);
+#define PROFILE_BEGIN_MT(TAG) do { abc::detail::profiler::GetInstance().tick_mt(#TAG);	  } while(false)
+#define PROFILE_END_MT(TAG)   do { abc::detail::profiler::GetInstance().tock_mt(#TAG);	  } while(false)
 
-#define PROFILE_SUMMARY(...)  do { abc::detail::Profiler::GetInstance().print_summary(##__VA_ARGS__); } while(false);
-
+#define PROFILE_SUMMARY(...)  do { abc::detail::profiler::GetInstance().print_summary(##__VA_ARGS__); } while(false)

@@ -10,7 +10,6 @@ namespace abc
 {
 //////////////////////////////////////////////////////////////////////////
 
-static struct none_t {} none;
 static struct success_t {} success;
 static struct uninitialized_t {} uninitialized;
 
@@ -23,14 +22,15 @@ namespace detail
 {
 //////////////////////////////////////////////////////////////////////////
 
-class noncopyable {
- public:
-  noncopyable(const noncopyable&) = delete;
-  noncopyable& operator=(const noncopyable&) = delete;
+class noncopyable
+{
+public:
+    noncopyable(const noncopyable &) = delete;
+    noncopyable &operator=(const noncopyable &) = delete;
 
- protected:
-  noncopyable()  = default;
-  ~noncopyable() = default;
+protected:
+    noncopyable()  = default;
+    ~noncopyable() = default;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -38,21 +38,25 @@ class noncopyable {
 
 //////////////////////////////////////////////////////////////////////////
 
-namespace helpers {
+namespace helpers
+{
 //////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-struct fail {
-  static const bool value = std::is_same<T, T>::value == false;
+struct fail
+{
+    static const bool value = std::is_same<T, T>::value == false;
 };
 
 template <typename T1, typename T2, bool SELECTOR = true>
-struct select_type {
+struct select_type
+{
     using type = T1;
 };
 template <typename T1, typename T2>
-struct select_type<T1, T2, false> {
-  using type = T2;
+struct select_type<T1, T2, false>
+{
+    using type = T2;
 };
 
 //////////////////////////////////////////////////////////////////////////

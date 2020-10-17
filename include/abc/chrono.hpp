@@ -57,7 +57,7 @@ namespace detail{
 ///////////////////////////////////////////////////////////////////////////////
 
 template <class R, class P>
-struct to_string_impl<std::chrono::duration<R, P>> {
+struct to_string_impl<std::chrono::duration<R, P>, false> {
   static abc::string impl(const std::chrono::duration<R, P>& duration) {
     auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
 

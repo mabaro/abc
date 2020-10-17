@@ -1,10 +1,13 @@
 # Tests need to be added as executable first
 add_executable(abc_test 
+	main.cpp
 	algo.cpp
+	enum.cpp
 	format.cpp
 	pointer.cpp
+	profiler.cpp
 	result.cpp
-	testlib.cpp
+	tagged_type.cpp
 	utils.cpp
 )
 target_link_directories(abc_test PRIVATE doctest::doctest)

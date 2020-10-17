@@ -70,12 +70,12 @@ void test_result_for_type()
         Type2
     };
     using result_t = result<RESULT, error<ErrType>>;
-    using error_t  = typename result_t::error_t;
-    static_assert(std::is_same<ErrType, error_t::code_t>::value, "mismatched types");
+    using error_t = typename result_t::error_t;
+    static_assert(std::is_same<ErrType, typename error_t::code_t>::value, "mismatched types");
 
     const auto successfulResult = RESULT();
 
-    {  // success
+    { // success
         result_t a(successfulResult);
         CHECK_EQ(a, abc::success);
         CHECK_EQ(a.get_payload(), successfulResult);
@@ -83,7 +83,7 @@ void test_result_for_type()
         CHECK_EQ(result<void>(abc::success), abc::success);
     }
 
-    {  // fails
+    { // fails
         result_t b = error_t(ErrType::Type1, abc::string("error 1"));
         CHECK(b != abc::success);
         CHECK(b.get_error().code() == ErrType::Type1);
@@ -119,15 +119,7 @@ TEST_CASE("abc - result")
     {
         int a;
         Dummy() : a(123) {}
-        bool operator==(const Dummy& other) const { return other.a == a; }
+        bool operator==(const Dummy &other) const { return other.a == a; }
     };
     test_result_for_type<Dummy>();
-}
-
-void t()
-{
-    struct Dummy
-    {
-    };
-    // abc::result<Dummy&> dummyRefResult;
 }

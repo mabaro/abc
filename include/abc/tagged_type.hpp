@@ -5,6 +5,7 @@
 
 namespace abc
 {
+    
 template <typename T, typename TTag, int64_t DefaultValue>
 class tagged_type
 {
