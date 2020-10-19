@@ -1,14 +1,19 @@
+#-> https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
+
 cmake_minimum_required(VERSION 3.17)
 
 if(${CMAKE_VERSION} VERSION_LESS 3.10)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(cpp
+project(abc
     VERSION 1.0
-    DESCRIPTION "CPP"
-    LANGUAGES CXX C
+    DESCRIPTION "ABC"
+    LANGUAGES CXX
 )
+
+# Make sure that custom modules are found
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
 ###################################################################
 
@@ -65,13 +70,6 @@ if(ENABLE_UNITY_BUILD)
 endif()
 
 #################################################################################
-
-### set cmake extensions directory
-#set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-)
 
 ### include useful modules
 include(StandardProjectSettings)
