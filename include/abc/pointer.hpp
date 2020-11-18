@@ -138,7 +138,7 @@ namespace abc
     public:
       virtual ~unique_pointer_internal()
       {
-        static_assert(!std::is_polymorphic<T>::value || std::has_virtual_destructor<T>::value || std::is_pod<T>::value,
+        static_assert(!std::is_polymorphic<T>::value || std::has_virtual_destructor<T>::value,
                       "Trying to delete a polymorphic object through a non-virtual destructor.\n");
         reset();
       }
