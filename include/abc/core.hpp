@@ -9,6 +9,12 @@
 #define ABC_NOTHROW   noexcept
 #define ABC_NODISCARD [[nodiscard]]
 
+// https://foonathan.net/2020/09/move-forward/
+#define ABC_MOVE(...) \ 
+  static_cast<std::remove_reference_t<decltype(__VA_ARGS__)>&&>(__VA_ARGS__)
+#define ABC_FORWARD(...) \
+  static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
+
 namespace abc
 {
 //////////////////////////////////////////////////////////////////////////
