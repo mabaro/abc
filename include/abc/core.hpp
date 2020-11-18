@@ -1,10 +1,13 @@
 #pragma once
-#define ABC_CORE_INCLUDED
 
-#include "abc/platform.hpp"
+#include "abc/platform/platform.hpp"
 #include <functional>
 
+#define ABC_CORE_INCLUDED
+
 #define ABC_UNUSED(X) (void)(X);
+#define ABC_NOTHROW   noexcept
+#define ABC_NODISCARD [[nodiscard]]
 
 namespace abc
 {
@@ -66,10 +69,3 @@ using noncopyable = detail::noncopyable;
 
 //////////////////////////////////////////////////////////////////////////
 }  // namespace abc
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
-#include "abc/platform.hpp"
-#include "abc/debug.hpp"
-#include "abc/pointer.hpp"

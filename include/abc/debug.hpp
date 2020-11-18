@@ -4,11 +4,12 @@
 // therefore, these dependencies will be kept at the end of this file
 #pragma once
 
+#include "abc/core.hpp"
+
 #ifndef ABC_CORE_INCLUDED
 #error "abc/core.hpp" needs to be included before this file.
 #endif
 
-#include "abc/platform.hpp"
 #include <iostream>
 
 #if defined(ABC_FORCE_DEBUG) && defined(ABC_RETAIL)

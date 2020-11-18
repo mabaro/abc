@@ -21,14 +21,20 @@ class inner_error<TError, TInnerErrors...> : protected inner_error<TInnerErrors.
 public:
     inner_error() = default;
     inline inner_error(const inner_error<TError, TInnerErrors...> &other)
-        : m_optError(other.m_optError)
+        : inner_error<TInnerErrors...>(other)
+        , m_optError(other.m_optError)
     {
     }
-    inline inner_error(const TError &err) : m_optError(err) {}
-    inline inner_error(const typename TError::code_t &errorCode) : m_optError(errorCode) {}
+    inline inner_error(const TError &err)
+		: inner_error<TInnerErrors...>()
+        , m_optError(err) {}
+    inline inner_error(const typename TError::code_t &errorCode)
+		: inner_error<TInnerErrors...>()
+		, m_optError(errorCode) {}
 
     template <typename InnerError>
-    inline inner_error(InnerError err) : inner_error<TInnerErrors...>(err)
+    inline inner_error(InnerError err)
+        : inner_error<TInnerErrors...>(err)
     {
     }
 
@@ -73,9 +79,12 @@ class inner_error<TError>
     abc::optional<TError> m_optError;
 
 public:
+    using error_t = typename std::remove_const<TError>::type;
+
+public:
     inner_error() = default;
     inline inner_error(const inner_error<TError> &other) : m_optError(other.m_optError) {}
-    inline inner_error(const TError &err) : m_optError(err) {}
+    inline inner_error(const error_t& err) : m_optError(err) {}
     inline inner_error(const typename TError::code_t &errorCode) : m_optError(errorCode) {}
 
     template <typename TInnerOrError = TError>
@@ -252,10 +261,11 @@ public:
         m_optError   = std::move(other.m_optError);
     }
 
-    inline result(const payload_t &result) : m_optPayload(result) {}
-    inline result(payload_t &&result) : m_optPayload(std::move(result)) {}
+    inline result(const payload_t& res) : m_optPayload(res) {}
+    inline result(payload_t &&res) : m_optPayload(std::move(res)) {}
 
-    inline result(const error_t &err) : m_optError(err) {}
+	inline result(const error_t& err) : m_optError(err) {}
+	inline result(error_t&& err) : m_optError(std::move(err)) {}
     inline result(const error_code_t &error_code) : m_optError(error_t(error_code)) {}
     inline result(const error_code_t &error_code, const abc::string &what)
         : m_optError(error_t(error_code, what))
@@ -298,7 +308,7 @@ public:
     }
 
 protected:
-    abc::optional<payload_t> m_optPayload;
+	abc::optional<payload_t> m_optPayload;
     abc::optional<error_t>   m_optError;
 
 private:

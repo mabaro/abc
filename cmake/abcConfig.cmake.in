@@ -1,0 +1,15 @@
+get_filename_component(ABC_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${ABC_CMAKE_DIR})
+# NOTE: to find Finddoctest.cmake
+find_dependency(doctest @MIN_doctest_VERSION@)
+list(REMOVE_AT CMAKE_MODULE_PATH -1)
+
+find_dependency(boost_regex @MIN_BOOST_VERSION@)
+
+if(NOT TARGET abc::abc)
+    include("${ABC_CMAKE_DIR}/abcTargets.cmake")
+endif()
+
+set(ABC_lIBRARIES abc::abc)

@@ -24,7 +24,7 @@ TEST_CASE("abc - error")
     };
     using error_t = error<generic_error_type, error<inner1>, error<inner2, error<inner3>>>;
 
-    auto err0 = error(generic_error_type::generic_error, "generic error");
+    auto err0 = error<generic_error_type>(generic_error_type::generic_error, "generic error");
     CHECK(err0.code() == generic_error_type::generic_error);
     auto err1 = error<inner1>(inner1::a, "inner 1 a");
     CHECK(err1.code() == inner1::a);
@@ -45,15 +45,15 @@ TEST_CASE("abc - error")
     auto msg02 = err02.message_with_inner();
     auto msg03 = err03.message_with_inner();
 
-    std::cout << msg00 << std::endl
-              << std::endl
-              << msg01 << std::endl
-              << std::endl
-              << msg02 << std::endl
-              << std::endl
-              << msg03 << std::endl
-              << std::endl
-              << std::endl;
+    // std::cout << msg00 << std::endl
+    //           << std::endl
+    //           << msg01 << std::endl
+    //           << std::endl
+    //           << msg02 << std::endl
+    //           << std::endl
+    //           << msg03 << std::endl
+    //           << std::endl
+    //           << std::endl;
 
     CHECK(err00.code() == generic_error_type::generic_error);
     CHECK(err00.code() == generic_error_type::generic_error);
@@ -70,12 +70,12 @@ void test_result_for_type()
         Type2
     };
     using result_t = result<RESULT, error<ErrType>>;
-    using error_t = typename result_t::error_t;
+    using error_t  = typename result_t::error_t;
     static_assert(std::is_same<ErrType, typename error_t::code_t>::value, "mismatched types");
 
-    const auto successfulResult = RESULT();
+    const auto successfulResult = RESULT{};
 
-    { // success
+    {  // success
         result_t a(successfulResult);
         CHECK_EQ(a, abc::success);
         CHECK_EQ(a.get_payload(), successfulResult);
@@ -83,7 +83,7 @@ void test_result_for_type()
         CHECK_EQ(result<void>(abc::success), abc::success);
     }
 
-    { // fails
+    {  // fails
         result_t b = error_t(ErrType::Type1, abc::string("error 1"));
         CHECK(b != abc::success);
         CHECK(b.get_error().code() == ErrType::Type1);
@@ -113,7 +113,7 @@ TEST_CASE("abc - result")
     test_result_for_type<int>();
     test_result_for_type<float>();
     test_result_for_type<abc::string>();
-    // test_result_for_type<abc::string&>();
+    //test_result_for_type<abc::string&>();
 
     struct Dummy
     {

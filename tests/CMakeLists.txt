@@ -4,12 +4,16 @@ add_executable(abc_test
 	algo.cpp
 	enum.cpp
 	format.cpp
+	#memory_mapping.cpp
+	optional.cpp
 	pointer.cpp
 	profiler.cpp
 	result.cpp
 	tagged_type.cpp
 	utils.cpp
 )
+
+target_compile_definitions(abc_test PRIVATE ABC_TESTING)
 target_link_directories(abc_test PRIVATE doctest::doctest)
 
 # Should be linked to the main library, as well as the testing library
@@ -17,7 +21,7 @@ target_link_libraries(abc_test
 	PRIVATE 
 		abc
 		doctest::doctest
-		project_options project_warnings
+		#project_options project_warnings
 )
 
 # If you register a test, then ctest and make test will run it.

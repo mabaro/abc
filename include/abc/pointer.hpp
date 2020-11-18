@@ -1,16 +1,20 @@
 #pragma once
 
-#include "abc/core.hpp"
+//#include "abc/core.hpp"
 #include "abc/debug.hpp"
+#include "abc/format.hpp"
 
 #include <atomic>
 #include <memory>
 
-#define ABC_TESTING_ENABLED
+#ifndef ABC_CORE_INCLUDED
+#pragma message( \
+    "core.hpp must be included before pointer.h")
+#endif
+
 #ifdef ABC_TESTING_ENABLED
 #pragma message( \
     "ABC_TESTING is enabled. Some protected members are now public for testing purposes.")
-#else
 #endif
 
 namespace abc
@@ -44,7 +48,7 @@ namespace abc
       using ref_count_t = long;
 
       //volatile long references = 1;
-      std::atomic<int32_t> references = 1;
+      std::atomic<int32_t> references = {1};
       bool isFreed = false;
 
     public:
@@ -53,7 +57,7 @@ namespace abc
       inline ref_count_t add_reference() { return ++references; }
       inline ref_count_t remove_reference()
       {
-        ABC_ASSERT(references > 0);
+        ABC_ASSERT(references > 0, "No references pending, double delete");
         return --references;
       }
       inline ref_count_t reference_count() { return references; }
@@ -134,7 +138,7 @@ namespace abc
     public:
       virtual ~unique_pointer_internal()
       {
-        static_assert(!std::is_polymorphic<T>::value || std::has_virtual_destructor<T>::value,
+        static_assert(!std::is_polymorphic<T>::value || std::has_virtual_destructor<T>::value || std::is_pod<T>::value,
                       "Trying to delete a polymorphic object through a non-virtual destructor.\n");
         reset();
       }
@@ -173,7 +177,7 @@ namespace abc
       {
         ABC_ASSERT(
             (m_pointer == nullptr && m_controlBlock == nullptr) || m_controlBlock->has_references(),
-            format("Assignment operator is gonna destroy a unique pointer, leaving '{}' dangling "
+            abc::format("Assignment operator is gonna destroy a unique pointer, leaving '{}' dangling "
                    "lent_pointers",
                    m_controlBlock->reference_count()));
         reset(nullptr);

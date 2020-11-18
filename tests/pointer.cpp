@@ -148,7 +148,6 @@ TEST_CASE("abc - unique_pointer - move") {
   ABC_CHECK(int2.get_raw_ptr() == nullptr);
 }
 
-
 TEST_CASE("abc - shared_pointer")
 {
   using namespace abc;
