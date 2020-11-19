@@ -2,6 +2,9 @@
 
 #include "abc/core.hpp"
 #include "abc/result.hpp"
+#include <ostream>
+
+////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE("abc - error")
 {

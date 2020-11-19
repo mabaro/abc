@@ -6,7 +6,7 @@
 #include "abc/format.hpp"
 #include "abc/string.hpp"
 
-ABC_ENUM(MyEnum, a, b, c, d);
+ABC_ENUM(MyEnum, a, b, c, d)
 ABC_ENUM_STRING_IMPL(, MyEnum);
 
 struct A
