@@ -66,7 +66,16 @@ add_subdirectory(src)
 target_compile_definitions(${PROJECT_NAME} INTERFACE $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>)
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-    -Wall -Wextra -Wpedantic -Werror>
+            -Wall -Wextra -Wpedantic
+            -Werror
+        #blacklisted
+            -Wno-c++98-compat
+            -Wno-c++98-compat-pedantic
+            -Wno-duplicate-enum
+            -Wno-exit-time-destructors
+            -Wno-gnu-zero-variadic-macro-arguments
+            -Wno-zero-as-null-pointer-constant
+>
     $<$<CXX_COMPILER_ID:MSVC>:/WX>
 )
 
