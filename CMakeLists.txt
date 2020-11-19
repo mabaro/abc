@@ -75,6 +75,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
             -Wno-exit-time-destructors
             -Wno-gnu-zero-variadic-macro-arguments
             -Wno-zero-as-null-pointer-constant
+            -Wno-unknown-warning
 >
     $<$<CXX_COMPILER_ID:MSVC>:/WX>
 )
