@@ -67,7 +67,7 @@ target_compile_definitions(${PROJECT_NAME} INTERFACE $<$<CXX_COMPILER_ID:MSVC>:N
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
             -Wall -Wextra -Wpedantic
-            -Werror
+            #-Werror
         #blacklisted
             -Wno-c++98-compat
             -Wno-c++98-compat-pedantic
