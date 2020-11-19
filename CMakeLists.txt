@@ -24,7 +24,7 @@ add_library(${PROJECT_NAME}
     src/core.cpp
     src/debug.cpp
     src/enum.cpp
-    src/memory_mapped_file.cpp
+    #src/memory_mapped_file.cpp
     src/pointer.cpp
     #
     include/abc/algo.hpp
