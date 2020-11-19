@@ -37,13 +37,12 @@ public:
                        cache_hint         hint        = cache_hint::normal);
     ~memory_mapped_file();
 
-    ABC_ENUM(OpenErrorCode, InvalidParameters, CannotOpenFile, FileNotFound, MappingAlreadyExists,
-             Unknown);
+    ABC_ENUM(OpenErrorCode, InvalidParameters, CannotOpenFile, FileNotFound, MappingAlreadyExists, Unknown)
     using open_error  = abc::error<OpenErrorCode>;
     using open_result = abc::result<void, open_error>;
-    open_result open(const std::string& filename,                                             //
-                     size_t             mappedBytes = static_cast<size_t>(map_range::whole),  //
-                     access_type        acess       = access_type::read,                      //
+    open_result open(const std::string& filename,                                              //
+                     size_t             mappedBytes = static_cast<size_t>(map_range::whole),   //
+                     access_type        acess       = access_type::read,                       //
                      cache_hint         hint        = cache_hint::normal);
     void        close();
 
@@ -57,10 +56,10 @@ public:
     size_t mapped_size() const;
     size_t get_page_size() const;
 
-    ABC_ENUM(RemapErrorCode, InvalidParameters);
+    ABC_ENUM(RemapErrorCode, InvalidParameters)
     using remap_error  = abc::error<RemapErrorCode>;
     using remap_result = result<void, remap_error>;
-    remap_result remap(uint64_t offsetMultipleOfPageSize, size_t mappedBytes);
+    remap_result remap(size_t offsetMultipleOfPageSize, size_t mappedBytes);
 
 protected:
     std::string m_filename;

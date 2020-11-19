@@ -93,10 +93,10 @@ memory_mapped_file::open_result memory_mapped_file::open(const std::string& file
                 return FILE_FLAG_RANDOM_ACCESS;
             case cache_hint::sequential:
                 return FILE_FLAG_SEQUENTIAL_SCAN;
-            default:
-                ABC_FAIL("not supported");
-                return 0;
+            //default:
         }
+        ABC_FAIL("not supported");
+        return 0;
     }();
 
     const DWORD windowsAccess = [&]() -> DWORD {
@@ -106,12 +106,12 @@ memory_mapped_file::open_result memory_mapped_file::open(const std::string& file
                 return GENERIC_READ;
             case access_type::write:
                 return GENERIC_WRITE;
-            case access_type::readwrite:
-                return GENERIC_READ | GENERIC_WRITE;
-            default:
-                ABC_FAIL("not supported");
-                return 0;
+             case access_type::readwrite:
+                 return GENERIC_READ | GENERIC_WRITE;
+            // default:
         }
+        ABC_FAIL("not supported");
+        return 0;
     }();
     const DWORD openMode = m_access == access_type::read ? OPEN_EXISTING : OPEN_ALWAYS;
 
@@ -146,19 +146,17 @@ memory_mapped_file::open_result memory_mapped_file::open(const std::string& file
     const DWORD windowsPageAccess = [&]() -> DWORD {
         switch (m_access)
         {
-            case access_type::read:
-                return PAGE_READONLY;
-            case access_type::write:
-                return PAGE_READWRITE;
-            case access_type::readwrite:
-                return PAGE_READWRITE;
-            default:
-                ABC_FAIL("not supported");
+            case access_type::read:      return PAGE_READONLY;
+            case access_type::write:     return PAGE_READWRITE;
+            case access_type::readwrite: return PAGE_READWRITE;
+            //default:
         }
+        ABC_FAIL("not supported");
         return 0;
     }();
-    const DWORD offsetLow  = DWORD(mappedBytes & 0xFFFFFFFF);
-    const DWORD offsetHigh = DWORD(mappedBytes >> 32);
+    constexpr size_t HMASK  = ~((size_t(1) << ((8*sizeof(mappedBytes))>>1))-1);
+    const DWORD offsetLow  = DWORD(mappedBytes & HMASK);
+    const DWORD offsetHigh = DWORD(mappedBytes >> (8*sizeof(mappedBytes)/2));
 
     m_impl->m_fileMapping = CreateFileMapping(
         m_impl->m_fileHandle,  // file (if INVALID_HANDLE_VALUE -> system paging files)
@@ -265,7 +263,7 @@ size_t memory_mapped_file::size() const { return m_filesize; }
 size_t memory_mapped_file::mapped_size() const { return m_mappedBytes; }
 
 /// replace mapping by a new one of the same file, offset MUST be a multiple of the page size
-memory_mapped_file::remap_result memory_mapped_file::remap(uint64_t offset, size_t mappedBytes)
+memory_mapped_file::remap_result memory_mapped_file::remap(size_t offset, size_t mappedBytes)
 {
     if (!m_impl->m_fileHandle)
     {
@@ -300,16 +298,13 @@ memory_mapped_file::remap_result memory_mapped_file::remap(uint64_t offset, size
     const DWORD windowsPageAccess = [&]() -> DWORD {
         switch (m_access)
         {
-            case access_type::read:
-                return FILE_MAP_READ;
-            case access_type::write:
-                return FILE_MAP_WRITE;
-            case access_type::readwrite:
-                return FILE_MAP_ALL_ACCESS;
-            default:
-                ABC_FAIL("not supported");
+            case access_type::read:      return FILE_MAP_READ;
+            case access_type::write:     return FILE_MAP_WRITE;
+            case access_type::readwrite: return FILE_MAP_ALL_ACCESS;
+            //default:
         }
 
+        ABC_FAIL("not supported");
         return 0;
     }();
     m_mappedFileView = MapViewOfFile(m_impl->m_fileMapping,  // filemapping
@@ -335,7 +330,7 @@ size_t memory_mapped_file::get_page_size() const
 }
 
 // Windows
-#else ABC_PLATFORM_LINUX_FAMILY
+#elif defined(ABC_PLATFORM_LINUX_FAMILY)
 // Linux
 // enable large file support on 32 bit systems
 #    ifndef _LARGEFILE64_SOURCE
@@ -536,13 +531,13 @@ const unsigned char* memory_mapped_file::getData() const
 bool memory_mapped_file::isValid() const { return _mappedView != NULL; }
 
 /// get file size
-uint64_t memory_mapped_file::size() const { return _filesize; }
+size_t memory_mapped_file::size() const { return _filesize; }
 
 /// get number of actually mapped bytes
 size_t memory_mapped_file::mappedSize() const { return _mappedBytes; }
 
 /// replace mapping by a new one of the same file, offset MUST be a multiple of the page size
-bool memory_mapped_file::remap(uint64_t offset, size_t mappedBytes)
+bool memory_mapped_file::remap(size_t offset, size_t mappedBytes)
 {
     if (!_file)
         return false;
@@ -628,7 +623,7 @@ bool memory_mapped_file::remap(uint64_t offset, size_t mappedBytes)
 }
 
 /// get OS page size (for remap)
-int memory_mapped_file::getpagesize()
+size_t memory_mapped_file::get_page_size()
 {
 #    ifdef _MSC_VER
     SYSTEM_INFO sysInfo;

@@ -204,13 +204,13 @@ const unsigned char* memory_mapped_file::getData() const
 bool memory_mapped_file::isValid() const { return _mappedView != NULL; }
 
 /// get file size
-uint64_t memory_mapped_file::size() const { return _filesize; }
+size_t memory_mapped_file::size() const { return _filesize; }
 
 /// get number of actually mapped bytes
 size_t memory_mapped_file::mappedSize() const { return _mappedBytes; }
 
 /// replace mapping by a new one of the same file, offset MUST be a multiple of the page size
-bool memory_mapped_file::remap(uint64_t offset, size_t mappedBytes)
+bool memory_mapped_file::remap(size_t offset, size_t mappedBytes)
 {
     if (!_file)
         return false;
@@ -296,7 +296,7 @@ bool memory_mapped_file::remap(uint64_t offset, size_t mappedBytes)
 }
 
 /// get OS page size (for remap)
-int memory_mapped_file::getpagesize()
+size_t memory_mapped_file::GetPageSize()
 {
 #ifdef _MSC_VER
     SYSTEM_INFO sysInfo;
