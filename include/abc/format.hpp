@@ -131,6 +131,7 @@ void extractParams(std::vector<string> &o_params, T head)
     o_params.insert(o_params.end(), abc::to_string(head));
 }
 
+#if 0 // UNUSED
 template <typename T, typename... Args>
 static abc::string GetParamFromArgs(size_t index, const T &head, Args... args)
 {
@@ -150,6 +151,7 @@ static abc::string GetParamFromArgs(size_t index, const T &head)
     }
     return abc::to_string(head);
 }
+#endif//UNUSED
 
 template <class FormatString = abc::string>
 struct format_string_adapter
