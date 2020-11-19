@@ -3,13 +3,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // C++ 
 ////////////////////////////////////////////////////////////////////////////////
-#if __cpluslus == 199711L
+#if __cplusplus == 199711L
 #  define ABC_CPP98
-#elif __cpluslus == 201103L
+#elif __cplusplus == 201103L
 #  define ABC_CPP11
-#elif __cpluslus == 201402L
+#elif __cplusplus == 201402L
 #  define ABC_CPP14
-#elif __cpluslus == 201703L
+#elif __cplusplus == 201703L
 #  define ABC_CPP17
 #  define ABC_OPTIONAL_SUPPORTED
 #endif
