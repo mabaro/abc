@@ -9,7 +9,7 @@ namespace abc
 template <typename T, typename TTag, int64_t DefaultValue>
 class tagged_type
 {
-    static_assert(std::is_trivial_v<T>, "Only trivial types are supported");
+    static_assert(std::is_trivial<T>::value, "Only trivial types are supported");
     T m_value;
 
 public:
