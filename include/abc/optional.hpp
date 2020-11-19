@@ -1,6 +1,6 @@
 #pragma once
 
-#if ABC_OPTIONAL_SUPPORTED
+#ifdef ABC_OPTIONAL_SUPPORTED
 #include <optional>
 #else
 #include <type_traits>
@@ -11,7 +11,7 @@ namespace abc
 {
     //////////////////////////////////////////////////////////////////////////
 
-#if ABC_OPTIONAL_SUPPORTED
+#ifdef ABC_OPTIONAL_SUPPORTED
     template <typename T>
     using optional = std::optional<T>;
     using none_t = std::nullopt_t;
@@ -31,7 +31,7 @@ namespace abc
         using ptr_t = raw_type *;
         using const_ptr_t = const ptr_t;
         using ref_t = raw_type &;
-        using const_ref_t = const ref_t;
+        using const_ref_t = const raw_type &;
         using rvalue_t = raw_type &&;
         using const_rvalue_t = const raw_type &&;
 

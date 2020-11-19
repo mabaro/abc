@@ -362,7 +362,7 @@ public:
 
     void ignore_result() const { set_checked(); }
 
-    bool operator==(success_t i_success) const
+    bool operator==(success_t) const
     {
         set_checked();
         return !m_optError.has_value();

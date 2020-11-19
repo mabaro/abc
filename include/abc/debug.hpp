@@ -54,6 +54,12 @@ namespace detail
 {
 enum class response { BREAK, CONTINUE };
 response do_assert(const char* condition, const char* file, int line, const char* message);
+
+template<typename PARAM>
+struct is_param_string                             { static constexpr bool value = false; };
+template<> struct is_param_string<char>            { static constexpr bool value = true; };
+template<size_t N> struct is_param_string<char[N]> { static constexpr bool value = true; };
+
 }  // namespace detail
 }  // namespace assert
 }  // namespace abc
@@ -64,59 +70,74 @@ response do_assert(const char* condition, const char* file, int line, const char
     std::cerr << abc::format("[ERROR][{}:{}] {}", __FILE__, __LINE__, \
                              abc::format(MSG, __VA_ARGS__))           \
               << std::endl;                                           \
-  } while (0);
+  } while (0)
+
 #define ABC_LOG_WARNING_IMPL(MSG, ...)                                  \
   do {                                                                  \
     std::cerr << abc::format("[WARNING][{}:{}] {}", __FILE__, __LINE__, \
                              abc::format(MSG, __VA_ARGS__))             \
               << std::endl;                                             \
-  } while (0);
+  } while (0)
+
 #define ABC_LOG_DEBUG_IMPL(MSG, ...)                                  \
   do {                                                                \
     std::cerr << abc::format("[DEBUG][{}:{}] {}", __FILE__, __LINE__, \
                              abc::format(MSG, __VA_ARGS__))           \
               << std::endl;                                           \
-  } while (0);
+  } while (0)
+
 #define ABC_LOG_INFO_IMPL(MSG, ...)                                  \
   do {                                                               \
     std::cerr << abc::format("[INFO][{}:{}] {}", __FILE__, __LINE__, \
                              abc::format(MSG, __VA_ARGS__))          \
               << std::endl;                                          \
-  } while (0);
+  } while (0)
 
 /// Assertions
-#define ABC_ASSERT_IMPL(_condition_, ...)                                                 \
+#define ABC_ASSERT_IMPL(condition, ...)                                                   \
   do {                                                                                    \
-    if (!(_condition_)) {                                                                 \
+  	const auto& __cond_result__ = (condition);																						\
+    ABC_UNUSED(__cond_result__);																											    \
+	  static_assert(!abc::assert::detail::is_param_string<decltype(__cond_result__)>::value,\
+      "Condition is a string, probably swapped parameter order");                         \
+    if (!(condition)) {                                                                   \
       abc::string msg = abc::format<abc::string>(__VA_ARGS__);                            \
-      if (abc::assert::detail::do_assert(#_condition_, __FILE__, __LINE__, msg.data()) == \
+      if (abc::assert::detail::do_assert(#condition, __FILE__, __LINE__, msg.data()) ==   \
           abc::assert::detail::response::BREAK) {                                         \
         ABC_BREAK();                                                                      \
       }                                                                                   \
     }                                                                                     \
-  } while (false);
+  } while (false)
+
+#define ABC_FAIL_IMPL(...) \
+  do {                                                                                  \
+      abc::string msg = abc::format<abc::string>(__VA_ARGS__);                          \
+      std::cerr << "FAIL: " << msg << "[" << __FILE__ << ":" << __LINE__  << "]"        \
+        << std::endl;                                                                   \
+      ABC_BREAK();                                                                      \
+  } while (false)
 
 ///////////////////////////////////////////////////////////////////////////////
 
 #if defined(ABC_DEBUG) || defined(ABC_RELEASE_CHECKED)
-#  define ABC_ASSERT(_condition_, ...)         ABC_ASSERT_IMPL(_condition_, ##__VA_ARGS__)
-#  define ABC_FAIL(...)                        ABC_ASSERT_IMPL(false, ##__VA_ARGS__)
-#  define ABC_ASSERT_RELEASE(_condition_, ...) ABC_ASSERT_IMPL(_condition_, ##__VA_ARGS__)
-#  define ABC_FAIL_RELEASE(...)                ABC_ASSERT_IMPL(false, ##__VA_ARGS__);
+#  define ABC_ASSERT(_condition_, ...)          ABC_ASSERT_IMPL(_condition_, ##__VA_ARGS__)
+#  define ABC_FAIL                              ABC_FAIL_IMPL
+#  define ABC_ASSERT_RELEASE(_condition_, ...)  ABC_ASSERT_IMPL(_condition_, ##__VA_ARGS__)
+#  define ABC_FAIL_RELEASE                      ABC_FAIL_IMPL
 
-#  define ABC_LOG_ERROR(MSG, ...)              ABC_LOG_ERROR_IMPL(MSG, ##__VA_ARGS__);
-#  define ABC_LOG_WARNING(MSG, ...)            ABC_LOG_WARNING_IMPL(MSG, ##__VA_ARGS__);
-#  define ABC_LOG_INFO(MSG, ...)               ABC_LOG_INFO_IMPL(MSG, ##__VA_ARGS__);
-#  define ABC_LOG_DEBUG(MSG, ...)              ABC_LOG_DEBUG_IMPL(MSG, ##__VA_ARGS__);
+#  define ABC_LOG_ERROR(MSG, ...)               ABC_LOG_ERROR_IMPL(MSG, ##__VA_ARGS__)
+#  define ABC_LOG_WARNING(MSG, ...)             ABC_LOG_WARNING_IMPL(MSG, ##__VA_ARGS__)
+#  define ABC_LOG_INFO(MSG, ...)                ABC_LOG_INFO_IMPL(MSG, ##__VA_ARGS__)
+#  define ABC_LOG_DEBUG(MSG, ...)               ABC_LOG_DEBUG_IMPL(MSG, ##__VA_ARGS__)
 #else
 #  define ABC_ASSERT(...)
 #  define ABC_FAIL(...)
-#  define ABC_ASSERT_RELEASE(_condition_, ...) ABC_ASSERT_IMPL(_condition_, ##__VA_ARGS__)
-#  define ABC_FAIL_RELEASE(...)                ABC_ASSERT_IMPL(false, ##__VA_ARGS__);
+#  define ABC_ASSERT_RELEASE(_condition_, ...)  ABC_ASSERT_IMPL(_condition_, ##__VA_ARGS__)
+#  define ABC_FAIL_RELEASE                      ABC_FAIL_IMPL
 
-#  define ABC_LOG_ERROR(MSG, ...)              ABC_LOG_ERROR_IMPL(MSG, ##__VA_ARGS__);
-#  define ABC_LOG_WARNING(MSG, ...)            ABC_LOG_WARNING_IMPL(MSG, ##__VA_ARGS__);
-#  define ABC_LOG_INFO(MSG, ...)               ABC_LOG_INFO_IMPL(MSG, ##__VA_ARGS__);
+#  define ABC_LOG_ERROR(MSG, ...)              ABC_LOG_ERROR_IMPL(MSG, ##__VA_ARGS__)
+#  define ABC_LOG_WARNING(MSG, ...)            ABC_LOG_WARNING_IMPL(MSG, ##__VA_ARGS__)
+#  define ABC_LOG_INFO(MSG, ...)               ABC_LOG_INFO_IMPL(MSG, ##__VA_ARGS__)
 #  define ABC_LOG_DEBUG(...)
 #endif
 
