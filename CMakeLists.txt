@@ -7,6 +7,7 @@ project(${PROJECT_NAME}
 )
 
 option(ENABLE_UNIT_TESTS "Enable unit tests" ON)
+option(ENABLE_EXCEPTIONS "Enable exceptions" OFF)
 
 #Make sure that custom modules like FindRapidJSON are found
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
@@ -54,6 +55,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC 
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        ####> Example of conditional includes
+        #"$<$<COMPILE_FEATURES:cxx_variadic_templates>:${with_variadics}>"
+        #"$<$<NOT:$<COMPILE_FEATURES:cxx_variadic_templates>>:${no_variadics}>"
+        ####<
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -63,7 +68,22 @@ add_subdirectory(src)
 ###############################################################################
 # Set properties
 
-target_compile_definitions(${PROJECT_NAME} INTERFACE $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
+
+if (NOT ENABLE_EXCEPTIONS)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE
+        $<$<CXX_COMPILER_ID:MSVC>:_HAS_EXCEPTIONS=0>
+    )
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/EHs-c->
+        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+            -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables>
+    )
+endif()
+
+target_compile_definitions(${PROJECT_NAME} INTERFACE
+        $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
+)
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
             -Wall -Wextra -Wpedantic
@@ -76,11 +96,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
             -Wno-gnu-zero-variadic-macro-arguments
             -Wno-zero-as-null-pointer-constant
             #-Wno-unknown-warning
->
+    >
     $<$<CXX_COMPILER_ID:MSVC>:/WX>
 )
-
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -104,14 +122,14 @@ install(TARGETS ${PROJECT_NAME}
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(EXPORT ${PROJECT_NAME}-targets
-  FILE
-    ${PROJECT_NAME}Targets.cmake
-  NAMESPACE
-    ${PROJECT_NAME}::
-  DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+#install(EXPORT ${PROJECT_NAME}-targets
+#  FILE
+#    ${PROJECT_NAME}Targets.cmake
+#  NAMESPACE
+#    ${PROJECT_NAME}::
+#  DESTINATION
+#    ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+#)
 
 #Create a ConfigVersion.cmake file
 include(CMakePackageConfigHelpers)
