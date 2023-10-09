@@ -6,7 +6,6 @@ project(${PROJECT_NAME}
     LANGUAGES CXX
 )
 
-option(ENABLE_UNIT_TESTS "Enable unit tests" ON)
 option(ENABLE_EXCEPTIONS "Enable exceptions" OFF)
 
 #Make sure that custom modules like FindRapidJSON are found
@@ -15,8 +14,25 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 ###############################################################################
 # Dependencies
 
-set(MIN_doctest_VERSION 1.1)
-find_package(doctest ${MIN_doctest_VERSION} REQUIRED MODULE)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    option(ENABLE_UNIT_TESTS "Enable unit tests" ON)
+    if (ENABLE_UNIT_TESTS)
+        message ("ABC UNITS TESTS enabled!")
+    
+        find_package(doctest QUIET)
+        if (NOT DOCTEST_FOUND)
+            message("Fetching doctest on abc")
+            FetchContent_Declare(doctest
+                GIT_REPOSITORY https://github.com/doctest/doctest.h
+                GIT_TAG HEAD
+                # OVERRIDE_FIND_PACKAGE
+            )
+            FetchContent_MakeAvailable(doctest)
+            set(doctest_DIR ${doctest_BINARY_DIR})
+            message("doctest dir: " ${doctest_BINARY_DIR})
+        endif (NOT DOCTEST_FOUND)
+    endif(ENABLE_UNIT_TESTS)
+endif(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 
 ###############################################################################
 # Targets and properties
@@ -85,7 +101,8 @@ target_compile_definitions(${PROJECT_NAME} INTERFACE
         $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
 )
 target_compile_options(${PROJECT_NAME} PRIVATE
-    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+    # $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:
             -Wall -Wextra -Wpedantic
             #-Werror
         #blacklisted
@@ -146,7 +163,7 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}Con
 
 #Install the config, configversion and custom find modules
 install(FILES
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/Finddoctest.cmake
+    # ${CMAKE_CURRENT_LIST_DIR}/cmake/Finddoctest.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION ${INSTALL_CONFIGDIR}
@@ -168,7 +185,7 @@ export(PACKAGE ${PROJECT_NAME})
 ##############################################
 ## Add tests
 
-if(${ENABLE_UNIT_TESTS})
+if(ENABLE_UNIT_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()

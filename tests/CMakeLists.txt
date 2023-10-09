@@ -14,11 +14,10 @@ add_executable(abc_test
 )
 
 target_compile_definitions(abc_test PRIVATE ABC_TESTING)
-target_link_directories(abc_test PRIVATE doctest::doctest)
+target_include_directories(abc_test PRIVATE )
 
 # Should be linked to the main library, as well as the testing library
 target_link_libraries(abc_test 
-	PRIVATE 
 		abc
 		doctest::doctest
 		#project_options project_warnings
