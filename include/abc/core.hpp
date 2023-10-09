@@ -5,37 +5,48 @@
 
 #define ABC_CORE_INCLUDED
 
-#define ABC_UNUSED(X) (void)(X);
+#ifdef ABC_UNUSED
+#elif (__GNUC__)
+#if defined(__clang__)
+#define ABC_UNUSED(x) x __attribute__((unused))
+#else
+#define ABC_UNUSED(__X__) __X__ __attribute__((unused))
+#endif
+#elif defined(__LCLINT__)
+#define ABC_UNUSED(x) /*@unused@*/ x
+#elif defined(__cplusplus)
+#define ABC_UNUSED(x)
+#else
+#define ABC_UNUSED(x) x
+#endif
+
 #define ABC_NOTHROW   noexcept
 #define ABC_NODISCARD [[nodiscard]]
 
 // https://foonathan.net/2020/09/move-forward/
-#define ABC_MOVE(...) \
-  static_cast<std::remove_reference_t<decltype(__VA_ARGS__)>&&>(__VA_ARGS__)
-#define ABC_FORWARD(...) \
-  static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
+#define ABC_MOVE(...)    static_cast<std::remove_reference_t<decltype(__VA_ARGS__)>&&>(__VA_ARGS__)
+#define ABC_FORWARD(...) static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
 
-namespace abc
-{
+namespace abc {
 //////////////////////////////////////////////////////////////////////////
 
-static struct success_t {} success;
-static struct uninitialized_t {} uninitialized;
+struct success_t { };
+static success_t ABC_UNUSED(success);
 
-template <class T>
-using function = std::function<T>;
+struct uninitialized_t { };
+static uninitialized_t ABC_UNUSED(uninitialized);
+
+template <class T> using function = std::function<T>;
 
 //////////////////////////////////////////////////////////////////////////
 
-namespace detail
-{
+namespace detail {
 //////////////////////////////////////////////////////////////////////////
 
-class noncopyable
-{
+class noncopyable {
 public:
-    noncopyable(const noncopyable &) = delete;
-    noncopyable &operator=(const noncopyable &) = delete;
+    noncopyable(const noncopyable&)            = delete;
+    noncopyable& operator=(const noncopyable&) = delete;
 
 protected:
     noncopyable()  = default;
@@ -43,35 +54,28 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////
-}  // namespace detail
+}   // namespace detail
 
 //////////////////////////////////////////////////////////////////////////
 
-namespace helpers
-{
+namespace helpers {
 //////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-struct fail
-{
+template <typename T> struct fail {
     static const bool value = std::is_same<T, T>::value == false;
 };
 
-template <typename T1, typename T2, bool SELECTOR = true>
-struct select_type
-{
+template <typename T1, typename T2, bool SELECTOR = true> struct select_type {
     using type = T1;
 };
-template <typename T1, typename T2>
-struct select_type<T1, T2, false>
-{
+template <typename T1, typename T2> struct select_type<T1, T2, false> {
     using type = T2;
 };
 
 //////////////////////////////////////////////////////////////////////////
-}  // namespace helpers
+}   // namespace helpers
 
 using noncopyable = detail::noncopyable;
 
 //////////////////////////////////////////////////////////////////////////
-}  // namespace abc
+}   // namespace abc
