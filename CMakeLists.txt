@@ -11,6 +11,9 @@ option(ENABLE_EXCEPTIONS "Enable exceptions" OFF)
 #Make sure that custom modules like FindRapidJSON are found
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake)
 
+#target_compile_definitions(abc PUBLIC $<$<CONFIG:Release>:ABC_DEBUG=0>)
+#target_compile_definitions(abc PUBLIC $<$<CONFIG:Debug>:ABC_DEBUG=1>)
+
 ###############################################################################
 # Dependencies
 
@@ -23,7 +26,7 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
         if (NOT DOCTEST_FOUND)
             message("Fetching doctest on abc")
             FetchContent_Declare(doctest
-                GIT_REPOSITORY https://github.com/doctest/doctest.h
+                GIT_REPOSITORY https://github.com/doctest/doctest.git
                 GIT_TAG HEAD
                 # OVERRIDE_FIND_PACKAGE
             )
