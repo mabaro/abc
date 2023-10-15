@@ -94,7 +94,7 @@ if (NOT ENABLE_EXCEPTIONS)
         $<$<CXX_COMPILER_ID:MSVC>:_HAS_EXCEPTIONS=0>
     )
     target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CXX_COMPILER_ID:MSVC>:/EHs-c- /wd4530>
+        $<$<CXX_COMPILER_ID:MSVC>:/D_HAS_EXCEPTIONS=0 /EHs-c- /wd4530>
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
             -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables>
     )
