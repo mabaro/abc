@@ -20,6 +20,7 @@ template <typename T>
 void
 DisplayType(T param)
 {
+    ABC_UNUSED(param);
     ABC_FAIL("Needs RTTI");
     // std::cout << "T type: " << typeid(T).name() << std::endl;
     // std::cout << "Param type: " << typeid(param).name() << std::endl;
@@ -39,6 +40,7 @@ template <typename T>
 int
 ComputeIndexInVariadic(int index = -1)
 {
+    ABC_UNUSED(index);
     return -1;
 }
 template <typename T, typename U, typename... Us>
@@ -55,8 +57,9 @@ ComputeIndexInVariadic(int index = -1)
 ///@return variadic argument at index position
 template <typename T>
 T
-get_variadic_argument(int ABC_UNUSED(index), const T& param)
+get_variadic_argument(int index, const T& param)
 {
+    ABC_UNUSED(index);
     ABC_ASSERT(index >= 0, "Not enough parameters in the variadic");
     return param;
 }

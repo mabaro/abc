@@ -5,20 +5,22 @@
 
 #define ABC_CORE_INCLUDED
 
-#ifdef ABC_UNUSED
+#ifdef ABC_UNUSED_DECL
 #elif (__GNUC__)
 #if defined(__clang__)
-#define ABC_UNUSED(x) x __attribute__((unused))
+#define ABC_UNUSED_DECL(x) x __attribute__((unused))
 #else
-#define ABC_UNUSED(__X__) __X__ __attribute__((unused))
-#endif
-#elif defined(__LCLINT__)
-#define ABC_UNUSED(x) /*@unused@*/ x
+#define ABC_UNUSED_DECL(__X__) __X__ __attribute__((unused))
+#endif   // #if (__GNUC__)
 #elif defined(__cplusplus)
-#define ABC_UNUSED(x)
+#define ABC_UNUSED_DECL(x)
 #else
-#define ABC_UNUSED(x) x
-#endif
+#define ABC_UNUSED_DECL(x) x
+#endif   // #ifndef ABC_UNUSED_DECL
+
+#ifndef ABC_UNUSED
+#define ABC_UNUSED(x) (void)(x)
+#endif   // #ifndef ABC_UNUSED
 
 #define ABC_NOTHROW   noexcept
 #define ABC_NODISCARD [[nodiscard]]
@@ -31,10 +33,10 @@ namespace abc {
 //////////////////////////////////////////////////////////////////////////
 
 struct success_t { };
-static success_t ABC_UNUSED(success);
+static success_t ABC_UNUSED_DECL(success);
 
 struct uninitialized_t { };
-static uninitialized_t ABC_UNUSED(uninitialized);
+static uninitialized_t ABC_UNUSED_DECL(uninitialized);
 
 template <class T> using function = std::function<T>;
 

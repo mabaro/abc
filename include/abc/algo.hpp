@@ -2,6 +2,7 @@
 
 #include "abc/function.hpp"
 #include <algorithm>
+#include <iterator>
 
 namespace abc
 {

@@ -25,6 +25,7 @@ struct to_string_impl
 {
     static abc::string impl(const T &value)
     {
+        ABC_UNUSED(value);
         static_assert(abc::helpers::fail<T>::value, "Missing type specialization for T");
         return abc::string("");
     }
@@ -35,6 +36,7 @@ struct from_string_impl
 {
     static abc::optional<T> impl(const abc::string &str)
     {
+        ABC_UNUSED(str);
         static_assert(abc::helpers::fail<T>::value, "Missing type specialization for T");
         return abc::none;
     }

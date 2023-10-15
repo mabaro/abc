@@ -957,6 +957,7 @@ template <typename T>
 inline unique_ref<T>
 promote_to_ref(unique_ref<T>&& pointer)
 {
+    ABC_UNUSED(pointer);
     static_assert(detail::always_fail<T>, "Cannot promote to reference a reference");
     return unique_ref<T>(reinterpret_cast<T*>(0xDEAD));
 }
