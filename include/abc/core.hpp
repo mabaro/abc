@@ -12,8 +12,6 @@
 #else
 #define ABC_UNUSED_DECL(__X__) __X__ __attribute__((unused))
 #endif   // #if (__GNUC__)
-#elif defined(__cplusplus)
-#define ABC_UNUSED_DECL(x)
 #else
 #define ABC_UNUSED_DECL(x) x
 #endif   // #ifndef ABC_UNUSED_DECL
